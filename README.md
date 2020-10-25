@@ -1,5 +1,5 @@
 # Go to Yandex Map Telegram Bot
-## Пользователь кидает адрес в бот, а бот возвращает ссылку на Я.Карты
+## Пользователь кидает текстовой адрес в Телеграм-бот, а бот возвращает ссылку на Яндекс.Карты
 
 - Адрес бота: https://t.me/gotoyam_bot
 - Имя бота: gotoyam_bot
@@ -11,6 +11,8 @@ https://prognote.ru/web-dev/beck-end/basics-of-creating-a-telegram-bot-in-python
 https://habr.com/ru/post/442800/
 
 https://tproger.ru/translations/telegram-bot-create-and-deploy/
+
+https://vc.ru/dev/156853-telegram-bot-dlya-polucheniya-adresa-po-lokacii-ili-koordinatam-python
 
 #### Работа с API Яндекс-карт:
 
