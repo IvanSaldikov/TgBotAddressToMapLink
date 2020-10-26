@@ -15,7 +15,7 @@ class YandexMap:
     # https://pypi.org/project/yandex-maps/ (только для второй версии Python)
 
     # Ключ API для Яндекс-карт (JavaScript API и HTTP Геокодер)
-    YANDEX_API_KEY = "{YOUR_API_TOKEN_HERE}"
+    YANDEX_API_KEY = "{YOUR_TOKEN_API_KEY_HERE}"
 
     def get_geocode(self, addr):
         """Метод для получения ширины и долготы по введенному адресу с помощьюч API Яндекс-карт"""
@@ -38,12 +38,13 @@ class TelegramBot:
     # https://habr.com/ru/post/442800/
 
     # Токен для Телеграм-бота
-    TG_TOKEN = '{YOUR_API_TOKEN_HERE}'
+    TG_TOKEN = '{YOUR_TOKEN_API_KEY_HERE}'
 
     def run_bot(self, yandex_map):
-        """Запускам ТГ-бота"""
+        """Запускам в работу ТГ-бота"""
         self.bot = telebot.TeleBot(self.TG_TOKEN)
 
+        # Обработка входящих сообщений - текстовых (text)
         @self.bot.message_handler(content_types=['text'])
         def get_text_messages(message):
             """Возвращаем геокод по введенному адресу в бота message.text"""
@@ -55,9 +56,11 @@ class TelegramBot:
                 long = arr[0]
                 wide = arr[1]
                 link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
+            # Отправляем ответное сообщение пользователю со ссылкой
             self.bot.send_message(message.from_user.id, link_to_yamaps)
 
-        self.bot.polling(none_stop=True)
+        # Запускаем слежение за командами пользователям из чата
+        self.bot.polling(timeout=0, none_stop=True, interval=30)
 
 
 if __name__ == '__main__':

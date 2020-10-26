@@ -38,3 +38,11 @@ https://yandex.ru/blog/mapsapi/18681
 ### Установка зависимостей
 
 pip install pyTelegramBotAPI
+
+### Хостинг
+
+Размещен на Heroku
+
+https://dashboard.heroku.com/apps/gentle-mesa-72344/deploy/heroku-git
+
+http://gentle-mesa-72344.herokuapp.com/
