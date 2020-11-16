@@ -6,13 +6,11 @@
 
 #### Как создать бота в ТГ:
 
-https://prognote.ru/web-dev/beck-end/basics-of-creating-a-telegram-bot-in-python/
+https://www.youtube.com/watch?v=Kh16iosOTIQ - Пишем Telegram бот для учёта расходов с Python, Asyncio/Aiogram, SQLite и Docker
 
-https://habr.com/ru/post/442800/
+https://github.com/alexey-goloburdin/telegram-finance-bot - исходники, на основе которых создавался бот
 
-https://tproger.ru/translations/telegram-bot-create-and-deploy/
 
-https://vc.ru/dev/156853-telegram-bot-dlya-polucheniya-adresa-po-lokacii-ili-koordinatam-python
 
 #### Работа с API Яндекс-карт:
 
