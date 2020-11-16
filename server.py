@@ -53,7 +53,7 @@ async def add_address(message: types.Message):
     """Добавляет новый адрес"""
     try:
         # address = addresses.add_address(message.text)
-        yandex_map = YandexMap()
+        yandex_map = YandexMap(YANDEX_TOKEN)
         yandex_answer = yandex_map.get_geocode(message.text)
         link_to_yamaps = 'Ничего не найдено, попробуйте повторить попытку позже'
         # Если пришел нормальный ответ от API (два числа через пробел)

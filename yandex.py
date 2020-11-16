@@ -8,8 +8,9 @@ class YandexMap:
     # https://developer.tech.yandex.ru/services/3
     # https://pypi.org/project/yandex-maps/ (только для второй версии Python)
 
-    # Ключ API для Яндекс-карт (JavaScript API и HTTP Геокодер)
-    YANDEX_API_KEY = ""
+    def __init__(self, yandex_token):
+        # Ключ API для Яндекс-карт (JavaScript API и HTTP Геокодер)
+        self.YANDEX_API_KEY = yandex_token
 
     def get_geocode(self, addr):
         """Метод для получения ширины и долготы по введенному адресу с помощьюч API Яндекс-карт"""
