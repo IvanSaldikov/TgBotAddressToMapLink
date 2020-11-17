@@ -9,6 +9,8 @@
 import configparser
 import logging
 import os
+from collections import namedtuple
+
 
 from aiogram import Bot, Dispatcher, executor, types
 
@@ -16,10 +18,22 @@ import exceptions
 #from categories import Categories
 #from middlewares import AccessMiddleware
 
+from typing import NamedTuple
+
 from yandex import YandexMap
 import addresses
 from categories import Categories
 
+
+class BotState():
+    input_mode: 0
+
+input_mode = 0
+
+class InputMode(NamedTuple):
+    """Структура режима ввода"""
+    id: int
+    name: str
 
 
 logging.basicConfig(level=logging.INFO)
@@ -49,7 +63,14 @@ if YANDEX_TOKEN == None:
 bot = Bot(token=API_TOKEN, proxy=PROXY_URL)
 dp = Dispatcher(bot)
 
-is_cat_added = False
+
+inputmodes = [
+    InputMode(id = 0, name="ADD_ADDRESS"),
+    InputMode(id = 1, name="ADD_CATEGORY"),
+    InputMode(id = 2, name="CHANGE_CAT"),
+]
+
+
 
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
@@ -91,6 +112,20 @@ async def del_category(message: types.Message):
     await message.answer(answer_message, parse_mode='Markdown')
 
 
+@dp.message_handler(lambda message: message.text.startswith('/addtocat'))
+async def add_to_category(message: types.Message):
+    """Удаляет одну запись об адресе по её идентификатору"""
+    addr_id = int(message.text[9:])
+    Categories(message.from_user.id).delete_category(row_id)
+    answer_message = (
+        f'Категория была успешно *удалена*\n\n'
+        f"Все Ваши адреса: /addresses\n\n"
+        f"Все Ваши категории: /categories\n\n"
+        f"Главное меню: /start\n\n"
+        )
+    await message.answer(answer_message, parse_mode='Markdown')
+
+
 @dp.message_handler(lambda message: message.text.startswith('/goto'))
 async def goto_address(message: types.Message):
     """Показывает ссылку на адрес на Яндекс.Картах по её идентификатору"""
@@ -120,7 +155,7 @@ async def showcataddr(message: types.Message):
 
     addresses_rows = [
         f"*{address_one.address}* - /goto{address_one.id}\n"
-        f"/addtocat - переместить этот адрес в другую категорию\n"
+        f"/addtocat{address_one.id} - переместить этот адрес в другую категорию\n"
         f"/deladdr{address_one.id} - удалить данный адрес из базы"
         for address_one in all_addresses]
     answer_message = f"Список адресов в категории *{cat_name}*:\n\n" + "\n\n"\
@@ -180,8 +215,8 @@ async def show_user_categories(message: types.Message):
 @dp.message_handler(commands=['addcat'])
 async def add_category(message: types.Message):
     """Переходит в режим добавления категории"""
-    global is_cat_added
-    is_cat_added = True
+    global input_mode
+    input_mode = 1
     answer_message = "Отправьте боту название новой категории для добавления\n\n" + \
             "Начальный экран: /start\n\n" +\
             "Добавить категорию: /addcat\n\n"
@@ -191,10 +226,10 @@ async def add_category(message: types.Message):
 @dp.message_handler()
 async def add_address(message: types.Message):
     """Добавляет новый адрес"""
-    global is_cat_added
+    global input_mode
     try:
-        # Если мы не в режиме добавления категории
-        if not is_cat_added:
+        # Добавляем адрес
+        if input_mode == 0:
             yandex_map = YandexMap(YANDEX_TOKEN)
             yandex_answer = yandex_map.get_geocode(message.text)
             link_to_yamaps = 'Ничего не найдено, попробуйте повторить попытку позже'
@@ -214,8 +249,9 @@ async def add_address(message: types.Message):
                 f"Все Ваши категории: /categories\n\n"
                 f"Главное меню: /start\n\n"
             )
-        else:
-            is_cat_added = False
+        # Добавляем категорию
+        elif input_mode == 1:
+            input_mode = 0
             Categories(message.from_user.id).add_category(message.text)
             answer_message = (
                 f"Новая категория добавлена: {message.text}\n\n"
@@ -223,6 +259,17 @@ async def add_address(message: types.Message):
                 f"Все Ваши адреса: /addresses\n\n"
                 f"Главное меню: /start\n\n"
             )
+        # Указываем в какую категорию поместить адрес
+        elif input_mode == 2:
+            input_mode = 0
+            Categories(message.from_user.id).add_category(message.text)
+            answer_message = (
+                f"Новая категория добавлена: {message.text}\n\n"
+                f"Все Ваши категории: /categories\n\n"
+                f"Все Ваши адреса: /addresses\n\n"
+                f"Главное меню: /start\n\n"
+            )
+
     except exceptions.NotCorrectMessage as e:
         await message.answer(str(e))
         return
