@@ -234,7 +234,7 @@ async def show_user_categories(message: types.Message):
         )
         return
     categories_rows = [
-        f"*{category_one.name}*\n"
+        f"*{category_one.name}* ({category_one.addr_counter})\n"
         f"/showcataddr{category_one.id} - просмотреть адреса категории\n"
         f"/delcat{category_one.id} - удалить данную категорию"
         for category_one in all_categories]

@@ -1,5 +1,5 @@
 """Работа с категориями адресов"""
-from typing import Dict, List, NamedTuple
+from typing import Dict, List, NamedTuple, Union
 
 import db
 from datetime_fmt import get_now_formatted
@@ -9,6 +9,7 @@ class Category(NamedTuple):
     id: int
     name: str
     user_id: int
+    addr_counter: Union[int, None]
 
 
 class Categories:
@@ -17,11 +18,18 @@ class Categories:
         self._categories = self._load_categories()
 
     def _load_categories(self) -> List[Category]:
-        """Возвращает справочник категорий адресов из БД для данного пользователя"""
+        """Возвращает справочник категорий адресов из БД для данного пользователя
+         с указанием количества адресов в данной категории"""
         cursor = db.get_cursor()
-        sql_str = ("select id, name, user_id, created "
-                       f"from categories where user_id = {self.get_user_id()} "
-                       "order by created desc LIMIT 20")
+        sql_str = (f"select c.id, c.name, c.user_id, IFNULL(adr_cnt.cnt, 0) as cnt "
+                   f"from categories as c "
+                   f"left join ("
+                   f"SELECT id, COUNT(*) as cnt "
+                   f"FROM addresses "
+                   f"GROUP BY category_id"
+                   f") as adr_cnt USING(id) "
+                   f"where c.user_id = {self.get_user_id()} "
+                   f"order by c.name asc LIMIT 20")
         cursor.execute(sql_str)
         categories = cursor.fetchall()
         categories_result = []
@@ -30,6 +38,7 @@ class Categories:
                 id=int(category[0]),
                 name=category[1],
                 user_id=int(category[2]),
+                addr_counter=category[3],
             ))
         return categories_result
 
