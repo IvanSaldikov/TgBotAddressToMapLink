@@ -13,7 +13,6 @@ import os
 from aiogram import Bot, Dispatcher, executor, types
 
 import exceptions
-#import expenses
 #from categories import Categories
 #from middlewares import AccessMiddleware
 
@@ -64,12 +63,29 @@ async def send_welcome(message: types.Message):
     )
 
 
+@dp.message_handler(lambda message: message.text.startswith('/del'))
+async def del_expense(message: types.Message):
+    """Удаляет одну запись об адресе по её идентификатору"""
+    row_id = int(message.text[4:])
+    addresses.delete_address(row_id)
+    answer_message = (
+        f'Адрес был успешно *удален*\n\n'
+        f"Все Ваши адреса: /addresses\n\n"
+        f"Главное меню: /start\n\n"
+        )
+    await message.answer(answer_message, parse_mode='Markdown')
+
+
 @dp.message_handler(commands=['addresses'])
 async def show_user_addresses(message: types.Message):
     """Отправляет список всех адресов пользователя"""
     all_addresses = addresses.get_all_addresses(message.from_user.id)
     if not all_addresses:
-        await message.answer("Вы ещё не сохранили ни одного адреса")
+        await message.answer(
+            "Список Ваших адресов пуст\n\n"
+            "Для добавления адреса, просто введите его в строку и отправьте боту\n\n"
+            "Начальный экран: /start"
+        )
         return
 
     addresses_rows = [
@@ -110,16 +126,6 @@ async def add_address(message: types.Message):
         )
     await message.answer(answer_message)
 
-@dp.message_handler(lambda message: message.text.startswith('/del'))
-async def del_expense(message: types.Message):
-    """Удаляет одну запись об адресе по её идентификатору"""
-    row_id = int(message.text[4:])
-    addresses.delete_address(row_id)
-    answer_message = (
-        f"Все Ваши адреса: /addresses\n\n"
-        f"Главное меню: /start\n\n"
-        )
-    await message.answer(answer_message)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
