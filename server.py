@@ -14,9 +14,9 @@ from typing import NamedTuple
 from aiogram import Bot, Dispatcher, executor, types
 
 from yandex import YandexMap
-from categories import Categories
+from categories import Category
+from addresses import Address
 import exceptions
-import addresses
 
 
 class BotState():
@@ -84,7 +84,7 @@ async def send_welcome(message: types.Message):
 async def del_address(message: types.Message):
     """Удаляет одну запись об адресе по её идентификатору"""
     row_id = int(message.text[8:])
-    addresses.delete_address(row_id)
+    Address().delete_address(row_id)
     answer_message = (
         f'Адрес был успешно *удален*\n\n'
         f"Все Ваши адреса: /addresses\n\n"
@@ -96,10 +96,19 @@ async def del_address(message: types.Message):
 @dp.message_handler(lambda message: message.text.startswith('/delcat'))
 async def del_category(message: types.Message):
     """Удаляет одну запись об адресе по её идентификатору"""
-    row_id = int(message.text[7:])
-    Categories(message.from_user.id).delete_category(row_id)
-    answer_message = (
-        f'Категория была успешно *удалена*\n\n'
+    cat_id = int(message.text[7:])
+    cat = Category(message.from_user.id)
+    if cat.get_cat_addr_stat(cat_id) == 0:
+        cat.delete_category(cat_id)
+        answer_message = (
+            f'Категория была успешно *удалена*\n\n'
+        )
+    else:
+        answer_message = (
+            f'*Нельзя удалять НЕпустую категорию.*\n\n'
+            f'*Удалите сначала адреса из этой категории, а затем удалите категорию.*\n\n'
+        )
+    answer_message += (
         f"Все Ваши адреса: /addresses\n\n"
         f"Все Ваши категории: /categories\n\n"
         f"Главное меню: /start\n\n"
@@ -111,8 +120,8 @@ async def del_category(message: types.Message):
 async def add_to_category(message: types.Message):
     """Удаляет одну запись об адресе по её идентификатору"""
     addr_id = int(message.text[9:])
-    addr_name = addresses.get_name_by_id(message.from_user.id, addr_id)
-    all_categories = Categories(message.from_user.id).get_all_categories()
+    addr_name = Address().get_name_by_id(message.from_user.id, addr_id)
+    all_categories = Category(message.from_user.id).get_all_categories()
     if not all_categories:
         await message.answer(
             "Список Ваших категорий пуст\n\n"
@@ -139,9 +148,9 @@ async def change_addr_cat(message: types.Message):
     try:
         addr_id = int(rows[0])
         cat_id = int(rows[1])
-        Categories(message.from_user.id).change_category_address(addr_id, cat_id)
-        cat_name = Categories(message.from_user.id).get_category_name(cat_id)
-        addr_name = addresses.get_name_by_id(message.from_user.id, addr_id)
+        Category(message.from_user.id).change_category_address(addr_id, cat_id)
+        cat_name = Category(message.from_user.id).get_category_name(cat_id)
+        addr_name = Address().get_name_by_id(message.from_user.id, addr_id)
         answer_message = f"Адрес *{addr_name}* теперь находится в новой категории *{cat_name}*\n\n" + \
                          f"Просмотреть содержимое в новой категории: /showcataddr{cat_id}"
     except:
@@ -158,7 +167,7 @@ async def change_addr_cat(message: types.Message):
 async def goto_address(message: types.Message):
     """Показывает ссылку на адрес на Яндекс.Картах по её идентификатору"""
     row_id = int(message.text[5:])
-    link_to_yamaps = addresses.get_link_ya_map(message.from_user.id, row_id)
+    link_to_yamaps = Address().get_link_ya_map(message.from_user.id, row_id)
     answer_message = (
         f"Ваша ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
         f"Все Ваши адреса: /addresses\n\n"
@@ -171,8 +180,8 @@ async def goto_address(message: types.Message):
 async def showcataddr(message: types.Message):
     """Показываем адреса в определенной категории"""
     cat_id = int(message.text[12:])
-    cat_name = Categories(message.from_user.id).get_category_name(cat_id)
-    all_addresses = addresses.get_all_addresses(message.from_user.id, cat_id)
+    cat_name = Category(message.from_user.id).get_category_name(cat_id)
+    all_addresses = Address().get_all_addresses(message.from_user.id, cat_id)
     if not all_addresses:
         await message.answer(
             f"Список адресов в категории *{cat_name}* пуст.\n\n"
@@ -199,7 +208,7 @@ async def showcataddr(message: types.Message):
 @dp.message_handler(commands=['addresses'])
 async def show_user_addresses(message: types.Message):
     """Отправляет список всех адресов пользователя"""
-    all_addresses = addresses.get_all_addresses_and_cats(message.from_user.id)
+    all_addresses = Address().get_all_addresses_and_cats(message.from_user.id)
     if not all_addresses:
         await message.answer(
             "Список Ваших адресов пуст\n\n"
@@ -224,7 +233,7 @@ async def show_user_addresses(message: types.Message):
 @dp.message_handler(commands=['categories'])
 async def show_user_categories(message: types.Message):
     """Отправляет список всех категорий адресов пользователя"""
-    all_categories = Categories(message.from_user.id).get_all_categories()
+    all_categories = Category(message.from_user.id).get_all_categories()
     if not all_categories:
         await message.answer(
             "Список Ваших категорий пуст\n\n"
@@ -275,7 +284,7 @@ async def add_address(message: types.Message):
                     long = arr[0]
                     wide = arr[1]
                     link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
-            addresses.add_address(message.text,
+            Address().add_address(message.text,
                                           link_to_yamaps,
                                           message.from_user.id)
             answer_message = (
@@ -288,7 +297,7 @@ async def add_address(message: types.Message):
         elif input_mode == 1:
             input_mode = 0
             cat_name = message.text
-            Categories(message.from_user.id).add_category(cat_name)
+            Category(message.from_user.id).add_category(cat_name)
             answer_message = (
                 f"Новая категория успешно добавлена: *{cat_name}/\n\n"
                 f"Все Ваши категории: /categories\n\n"
