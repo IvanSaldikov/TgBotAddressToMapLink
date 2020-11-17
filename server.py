@@ -76,6 +76,20 @@ async def del_expense(message: types.Message):
     await message.answer(answer_message, parse_mode='Markdown')
 
 
+@dp.message_handler(lambda message: message.text.startswith('/goto'))
+async def del_expense(message: types.Message):
+    """Показывает ссылку на адрес на Яндекс.Картах по её идентификатору"""
+    row_id = int(message.text[5:])
+    link_to_yamaps = addresses.get_link_ya_map(message.from_user.id, row_id)
+    print(link_to_yamaps)
+    answer_message = (
+        f"Ваша ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
+        f"Все Ваши адреса: /addresses\n\n"
+        f"Главное меню: /start\n\n"
+        )
+    await message.answer(answer_message, parse_mode='Markdown')
+
+
 @dp.message_handler(commands=['addresses'])
 async def show_user_addresses(message: types.Message):
     """Отправляет список всех адресов пользователя"""

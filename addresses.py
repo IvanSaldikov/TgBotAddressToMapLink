@@ -62,6 +62,22 @@ def get_all_addresses(user_id) -> List[Address]:
     addresses = [Address(id=row[0], address=row[1], link_to_ya_map=row[2], user_id=row[3]) for row in rows]
     return addresses
 
+
 def delete_address(row_id: int) -> None:
     """Удаляет адрес по его идентификатору"""
     db.delete("addresses", row_id)
+
+
+def get_link_ya_map(user_id, row_id):
+    """Возвращаем ссылку на Яндекс.Карты"""
+    cursor = db.get_cursor()
+    sql = ("select id, link_to_ya_map, user_id "
+                   f"from addresses where user_id = {int(user_id)} "
+                   f"AND id={row_id}")
+    print(sql)
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    if not result[1]:
+        return "Ссылка не найдена"
+    link_to_ya_map = result[1] if result[1] else 0
+    return link_to_ya_map
