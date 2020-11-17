@@ -57,11 +57,12 @@ async def add_address(message: types.Message):
         yandex_answer = yandex_map.get_geocode(message.text)
         link_to_yamaps = 'Ничего не найдено, попробуйте повторить попытку позже'
         # Если пришел нормальный ответ от API (два числа через пробел)
-        arr = str(yandex_answer).split()
-        if len(arr) == 2:
-            long = arr[0]
-            wide = arr[1]
-            link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
+        if yandex_answer != -1:
+            arr = str(yandex_answer).split()
+            if len(arr) == 2:
+                long = arr[0]
+                wide = arr[1]
+                link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
     except exceptions.NotCorrectMessage as e:
         await message.answer(str(e))
         return

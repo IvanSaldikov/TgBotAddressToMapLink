@@ -11,7 +11,6 @@ https://www.youtube.com/watch?v=Kh16iosOTIQ - Пишем Telegram бот для 
 https://github.com/alexey-goloburdin/telegram-finance-bot - исходники, на основе которых создавался бот
 
 
-
 #### Работа с API Яндекс-карт:
 
 https://ru.stackoverflow.com/questions/1073864/Как-в-python-работать-с-api-Яндекса
@@ -44,3 +43,13 @@ pip install pyTelegramBotAPI
 https://dashboard.heroku.com/apps/gentle-mesa-72344/deploy/heroku-git
 
 http://gentle-mesa-72344.herokuapp.com/
+
+
+#### Docker 
+
+Основы Docker. Большой практический выпуск - https://www.youtube.com/watch?v=QF4ZF857m44
+
+В конце - развертывание: https://www.youtube.com/watch?v=Kh16iosOTIQ
+
+Установка под Debian:
+https://www.8host.com/blog/ustanovka-i-ispolzovanie-docker-v-debian-9/

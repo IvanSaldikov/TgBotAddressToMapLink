@@ -12,8 +12,8 @@ ENV TELEGRAM_PROXY_PASSWORD=""
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN pip install -U pip aiogram pytz && apt-get update && apt-get install sqlite3
+COPY requirements.txt ./
+RUN pip install -r requirements.txt && apt-get update && apt-get install sqlite3
 COPY *.py ./
-COPY createdb.sql ./
 
-ENTRYPOINT ["python", "server.py"]
+ENTRYPOINT ["python3", "server.py"]

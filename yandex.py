@@ -16,9 +16,12 @@ class YandexMap:
         """Метод для получения ширины и долготы по введенному адресу с помощьюч API Яндекс-карт"""
         URL = f"https://geocode-maps.yandex.ru/1.x/?apikey={self.YANDEX_API_KEY}&geocode={addr}&format=json&results=1&lang=ru_RU"
         result = requests.get(URL).json()
-        # return result['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['text']
-        # Возвращаем координаты точки адреса, введенного пользователем
-        return result['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos']
+        try:
+            # return result['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['text']
+            # Возвращаем координаты точки адреса, введенного пользователем
+            return result['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos']
+        except:
+            return -1
 
     def form_href_to_yamap(self, long, wide):
         """Формируем ссылку на карты для перехода"""
