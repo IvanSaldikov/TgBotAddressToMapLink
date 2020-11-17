@@ -15,6 +15,8 @@ class Address(NamedTuple):
     address: str
     link_to_ya_map: str
     user_id: int
+    category_name: str
+    cat_id: int
 
 
 def add_address(address: str, link_to_ya_map: str, user_id: int) -> str:
@@ -47,11 +49,17 @@ def get_all_addresses(user_id, cat_id=None) -> List[Address]:
     added_sql_str = ''
     if cat_id is not None:
         added_sql_str = f' and category_id={cat_id}'
+
     cursor.execute("select id, address, link_to_ya_map, user_id "
                    f"from addresses where `user_id` = '{user_id}'{added_sql_str} "
                    "order by created desc LIMIT 40")
     rows = cursor.fetchall()
-    addresses = [Address(id=row[0], address=row[1], link_to_ya_map=row[2], user_id=row[3]) for row in rows]
+    addresses = [Address(id=row[0],
+                         address=row[1],
+                         link_to_ya_map=row[2],
+                         user_id=row[3],
+                         category_name='',
+                         cat_id=-1) for row in rows]
     return addresses
 
 
@@ -86,3 +94,22 @@ def get_name_by_id(user_id: int, addr_id: int) -> str:
         return "Адрес не найден"
     address_name = result[1] if result[1] else 0
     return address_name
+
+def get_all_addresses_and_cats(user_id: int) -> List[Address]:
+    """Возвращает список всех адресов, введенных пользователем, с указанием категорий"""
+    cursor = db.get_cursor()
+    sql_str = ("select a.id, a.address, a.user_id, c.name, c.id "
+                   f"from addresses a left join categories c "
+                   f"on a.category_id=c.id "
+                   f"where a.user_id = '{int(user_id)}' "
+                   "order by a.created desc LIMIT 40")
+    cursor.execute(sql_str)
+    rows = cursor.fetchall()
+    addresses = [Address(id=row[0],
+                         address=row[1],
+                         link_to_ya_map='',
+                         user_id=row[2],
+                         category_name=row[3],
+                         cat_id=row[4]) for row in rows]
+    return addresses
+
