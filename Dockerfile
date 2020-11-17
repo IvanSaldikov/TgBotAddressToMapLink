@@ -17,7 +17,7 @@ RUN pip install -r requirements.txt && apt-get update && apt-get install sqlite3
 COPY *.py ./
 COPY *.sql ./
 RUN mkdir db
-COPY db/* ./db/
-RUN cat ./createdb.sql | sqlite3  ./db/addresses.db
+#COPY db/* ./db/
+#RUN cat ./createdb.sql | sqlite3  ./db/addresses.db
 
 ENTRYPOINT ["python3", "server.py"]

@@ -1,0 +1,88 @@
+## Как развернуть на сервере
+
+### Используем Docker
+
+Как устанавливать и работать с Докером - тут https://www.youtube.com/watch?v=QF4ZF857m44
+
+Как установить Docker-compose 
+
+1. Push-им окончательную версию проекта на github.com
+2. На Linux-подобной машине делаем git clone (или merge, если уже есть)
+3. Собираем образ Docker-а на Докер-хабе:
+
+https://hub.docker.com/repositories
+
+`sudo docker build -t klezcool/yandex_bot ./`
+
+где `klezcool` - это имя пользователя на Докер-Хабе (./ - это сборка из текущей директории).
+
+`sudo docker push klezcool/yandex_bot` - отправляем на сервер (расшариваем)
+
+
+#### Проверка работы образа
+
+`sudo docker run --rm -d -e TELEGRAM_API_TOKEN=... -e YANDEX_API_KEY=... --name yb klezcool/yandex_bot` - 
+запускаем...
+
+`-d` - запуск в фоне (убрать для тестирования)
+
+`--rm` - удалить контейнер после завершения
+
+`-e` - задаем переменные окружения (необходимы для работы приложения)
+
+`--name` - yb - имя контейнера, klezcool/yandex_bot - имя образа
+
+
+#### На удаленном сервере - 1 (через Docker)
+
+Основные команды: docker ps -a - отобразить все контейнеры (даже завершенные)
+
+docker rmi X - удалить образ X
+
+docker rm Y - удалить контейнер Y
+
+`sudo docker pull klezcool/yandex_bot` - сначала забираем образ из удаленного репозитория.
+
+Затем запускаем:
+`sudo docker run --rm -d -e TELEGRAM_API_TOKEN=... -e YANDEX_API_KEY=... -v /home/www/code/tgbots/yandex_tg_bot/db:/db/ --name yb klezcool/yandex_bot`
+
+`-d` - запуск в фоне (убрать для тестирования)
+
+`--rm` - удалить контейнер после завершения
+
+`-e` - задаем переменные окружения (необходимы для работы приложения)
+
+`-v` - задает локальный каталог (в примере `/home/www/code/tgbots/yandex_tg_bot/db`), который монтируется в каталог конейнера - `/db/` в примере (нужно для сохранения баз данных)
+
+`--name` - yb - имя контейнера, klezcool/yandex_bot - имя образа
+
+
+### На удаленном сервере - 2 (через Docker-compose)
+
+Ножно создать отдельную папку и файл с именем `docker-compose.yaml` с содержанием:
+
+```yaml
+version: "3"
+services:
+  YandexTgBot:
+    image: klezcool/yandex_bot
+    restart: always
+    volumes:
+     - /home/www/code/tgbots/yandex_tg_bot/db:/home/db
+    environment:
+     - YANDEX_API_KEY=...
+     - TELEGRAM_API_TOKEN=...
+```
+где
+
+- `klezcool/yandex_bot` - название образа на Докер-хабе,
+
+- `/home/www/code/tgbots/yandex_tg_bot/db` - абсолютный путь на сервере
+
+- `/home/db` - абсолютный путь внутри контейнера - нужно для того, чтобы изменения в папке db сохранялись на сервере и мы не похерели данные.
+
+Далее запускаем это всё из текущей папки командой:
+
+`docker-compose up -d`
+
+- `-d` - параметр для работы в фоне.

@@ -1,0 +1,10 @@
+version: "3"
+services:
+  YandexTgBot:
+    image: klezcool/yandex_bot
+    restart: always
+    volumes:
+     - ./home/on/remote/db:./db
+    environment:
+     - YANDEX_API_KEY=...
+     - TELEGRAM_API_TOKEN=...
