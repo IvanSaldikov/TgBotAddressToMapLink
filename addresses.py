@@ -7,6 +7,8 @@ import pytz
 import db
 import exceptions
 
+from categories import Category
+
 
 class Address(NamedTuple):
     """Структура добавленного в БД адреса"""
@@ -57,7 +59,7 @@ def get_all_addresses(user_id) -> List[Address]:
     cursor = db.get_cursor()
     cursor.execute("select id, address, link_to_ya_map, user_id "
                    f"from addresses where user_id = {user_id} "
-                   "order by created desc LIMIT 100")
+                   "order by created desc LIMIT 40")
     rows = cursor.fetchall()
     addresses = [Address(id=row[0], address=row[1], link_to_ya_map=row[2], user_id=row[3]) for row in rows]
     return addresses
@@ -71,13 +73,14 @@ def delete_address(row_id: int) -> None:
 def get_link_ya_map(user_id, row_id):
     """Возвращаем ссылку на Яндекс.Карты"""
     cursor = db.get_cursor()
-    sql = ("select id, link_to_ya_map, user_id "
+    sql_str = ("select id, link_to_ya_map, user_id "
                    f"from addresses where user_id = {int(user_id)} "
                    f"AND id={row_id}")
-    print(sql)
-    cursor.execute(sql)
+    cursor.execute(sql_str)
     result = cursor.fetchone()
     if not result[1]:
         return "Ссылка не найдена"
     link_to_ya_map = result[1] if result[1] else 0
     return link_to_ya_map
+
+
