@@ -62,6 +62,12 @@ class Categories:
         })
         return
 
+    def change_category_address(self, address_id, cat_id: int) -> None:
+        """Меняем категорию у адреса"""
+        cursor = db.get_cursor()
+        sql_str = (f"update addresses set category_id={cat_id} where user_id={self.get_user_id()} and id={address_id}")
+        cursor.execute(sql_str)
+
     def delete_category(self, row_id: int) -> None:
         """Удаляет категорию по ее идентификатору"""
         cursor = db.get_cursor()

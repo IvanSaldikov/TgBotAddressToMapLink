@@ -9,20 +9,14 @@
 import configparser
 import logging
 import os
-from collections import namedtuple
-
+from typing import NamedTuple
 
 from aiogram import Bot, Dispatcher, executor, types
 
-import exceptions
-#from categories import Categories
-#from middlewares import AccessMiddleware
-
-from typing import NamedTuple
-
 from yandex import YandexMap
-import addresses
 from categories import Categories
+import exceptions
+import addresses
 
 
 class BotState():
@@ -116,14 +110,47 @@ async def del_category(message: types.Message):
 async def add_to_category(message: types.Message):
     """Удаляет одну запись об адресе по её идентификатору"""
     addr_id = int(message.text[9:])
-    Categories(message.from_user.id).delete_category(row_id)
-    answer_message = (
-        f'Категория была успешно *удалена*\n\n'
-        f"Все Ваши адреса: /addresses\n\n"
-        f"Все Ваши категории: /categories\n\n"
-        f"Главное меню: /start\n\n"
+    addr_name = addresses.get_name_by_id(message.from_user.id, addr_id)
+    all_categories = Categories(message.from_user.id).get_all_categories()
+    if not all_categories:
+        await message.answer(
+            "Список Ваших категорий пуст\n\n"
+            "Для добавления категории введите /addcat\n\n"
+            "Начальный экран: /start"
         )
+        return
+    categories_rows = [
+        f"*{category_one.name}* - /choosecat{addr_id}to{category_one.id}\n"
+        for category_one in all_categories]
+    answer_message = f"Выберите категорию, в которую необходимо переместить адрес *{addr_name}*:\n\n" + "\n\n"\
+            .join(categories_rows) + \
+            "\n\nНачальный экран: /start" + \
+            "\n\nВсе Ваши адреса: /addresses" + \
+            "\n\nВсе Ваши категории: /categories"
     await message.answer(answer_message, parse_mode='Markdown')
+
+
+@dp.message_handler(lambda message: message.text.startswith('/choosecat'))
+async def change_addr_cat(message: types.Message):
+    """Меняем категорию адреса"""
+    addr_id_to_cat = message.text[10:]
+    rows = addr_id_to_cat.split('to')
+    try:
+        addr_id = int(rows[0])
+        cat_id = int(rows[1])
+        Categories(message.from_user.id).change_category_address(addr_id, cat_id)
+        cat_name = Categories(message.from_user.id).get_category_name(cat_id)
+        addr_name = addresses.get_name_by_id(message.from_user.id, addr_id)
+        answer_message = f"Адрес *{addr_name}* теперь находится в новой категории *{cat_name}*\n\n" + \
+                         f"Просмотреть содержимое в новой категории: /showcataddr{cat_id}"
+    except:
+        answer_message = f"Ошибка при передаче параметров"
+
+    answer_message += "\n\nВсе Ваши адреса: /addresses" + \
+                        "\n\nВсе Ваши категории: /categories" + \
+                        "\n\nНачальный экран: /start"
+    await message.answer(answer_message, parse_mode='Markdown')
+
 
 
 @dp.message_handler(lambda message: message.text.startswith('/goto'))
@@ -147,10 +174,12 @@ async def showcataddr(message: types.Message):
     all_addresses = addresses.get_all_addresses(message.from_user.id, cat_id)
     if not all_addresses:
         await message.answer(
-            f"Список адресов в категории *{cat_name}* пуст\n\n"
-            "Для добавления адреса в данную категорию перейдите в список всех адресов\n\n"
+            f"Список адресов в категории *{cat_name}* пуст.\n\n"
+            "Для добавления адреса в данную категорию перейдите в список всех адресов.\n\n"
+            "Список ваших адресов: /addresses\n\n"
+            "Список ваших категорий: /categories\n\n"
             "Начальный экран: /start"
-        )
+        , parse_mode='Markdown')
         return
 
     addresses_rows = [
@@ -158,10 +187,11 @@ async def showcataddr(message: types.Message):
         f"/addtocat{address_one.id} - переместить этот адрес в другую категорию\n"
         f"/deladdr{address_one.id} - удалить данный адрес из базы"
         for address_one in all_addresses]
-    answer_message = f"Список адресов в категории *{cat_name}*:\n\n" + "\n\n"\
-            .join(addresses_rows) + \
-            "\n\nСписок ваших категорий: /categories" +\
-            "\n\nНачальный экран: /start"
+    answer_message = f"Список адресов в категории *{cat_name}*:\n\n" + "\n\n" \
+                    .join(addresses_rows) + \
+                    "\n\nСписок ваших категорий: /categories" + \
+                     "\n\nСписок ваших адресов: /addresses" + \
+                     "\n\nНачальный экран: /start"
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -179,7 +209,7 @@ async def show_user_addresses(message: types.Message):
 
     addresses_rows = [
         f"*{address_one.address}* - /goto{address_one.id}\n"
-        f"/addtocat - добавить этот адрес в категорию\n"
+        f"/addtocat{address_one.id} - добавить этот адрес в категорию\n"
         f"/deladdr{address_one.id} - удалить данный адрес из базы"
         for address_one in all_addresses]
     answer_message = "Ваш список адресов:\n\n" + "\n\n"\
@@ -218,8 +248,8 @@ async def add_category(message: types.Message):
     global input_mode
     input_mode = 1
     answer_message = "Отправьте боту название новой категории для добавления\n\n" + \
-            "Начальный экран: /start\n\n" +\
-            "Добавить категорию: /addcat\n\n"
+            "Список категорий: /categories\n\n" +\
+            "Начальный экран: /start\n\n"
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -252,24 +282,14 @@ async def add_address(message: types.Message):
         # Добавляем категорию
         elif input_mode == 1:
             input_mode = 0
-            Categories(message.from_user.id).add_category(message.text)
+            cat_name = message.text
+            Categories(message.from_user.id).add_category(cat_name)
             answer_message = (
-                f"Новая категория добавлена: {message.text}\n\n"
+                f"Новая категория успешно добавлена: *{cat_name}/\n\n"
                 f"Все Ваши категории: /categories\n\n"
                 f"Все Ваши адреса: /addresses\n\n"
                 f"Главное меню: /start\n\n"
             )
-        # Указываем в какую категорию поместить адрес
-        elif input_mode == 2:
-            input_mode = 0
-            Categories(message.from_user.id).add_category(message.text)
-            answer_message = (
-                f"Новая категория добавлена: {message.text}\n\n"
-                f"Все Ваши категории: /categories\n\n"
-                f"Все Ваши адреса: /addresses\n\n"
-                f"Главное меню: /start\n\n"
-            )
-
     except exceptions.NotCorrectMessage as e:
         await message.answer(str(e))
         return

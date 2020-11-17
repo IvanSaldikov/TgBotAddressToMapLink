@@ -74,3 +74,15 @@ def get_link_ya_map(user_id, row_id):
     return link_to_ya_map
 
 
+def get_name_by_id(user_id: int, addr_id: int) -> str:
+    """Возвращаем название адреса по его id"""
+    cursor = db.get_cursor()
+    sql_str = ("select id, address, user_id "
+                   f"from addresses where user_id = {int(user_id)} "
+                   f"AND id={int(addr_id)}")
+    cursor.execute(sql_str)
+    result = cursor.fetchone()
+    if not result[1]:
+        return "Адрес не найден"
+    address_name = result[1] if result[1] else 0
+    return address_name
