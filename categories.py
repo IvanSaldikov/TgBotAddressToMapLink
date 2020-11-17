@@ -2,7 +2,7 @@
 from typing import Dict, List, NamedTuple
 
 import db
-
+from datetime_fmt import get_now_formatted
 
 class Category(NamedTuple):
     """Структура категории"""
@@ -22,15 +22,10 @@ class Categories:
         sql_str = ("select id, name, user_id, created "
                        f"from categories where user_id = {self.get_user_id()} "
                        "order by created desc LIMIT 20")
-        #print(sql_str)
         cursor.execute(sql_str)
         categories = cursor.fetchall()
         categories_result = []
-        #print(categories)
         for index, category in enumerate(categories):
-            print(category)
-            print(type(category))
-            print('categories',categories)
             categories_result.append(Category(
                 id=int(category[0]),
                 name=category[1],
@@ -46,10 +41,26 @@ class Categories:
         """Возвращает id текущего пользователя."""
         return self._user_id
 
-    def get_category(self, category_id: str) -> Category:
-        """Возвращает категорию по id."""
-        finded = None
-        return finded
+    def get_category_name(self, cat_id: int) -> Category:
+        """Возвращает отображаемое название категории по id."""
+        cursor = db.get_cursor()
+        sql_str = ("select id, name, user_id "
+                       f"from categories where user_id = {self.get_user_id()} and id={cat_id} ")
+        cursor.execute(sql_str)
+        row = cursor.fetchone()
+        if row[1]:
+            cat_name = row[1]
+        else:
+            cat_name = '*UNKNOWN*'
+        return cat_name
+
+    def add_category(self, name: str) -> None:
+        db.insert("categories", {
+            "user_id": self.get_user_id(),
+            "name": name,
+            "created": get_now_formatted()
+        })
+        return
 
     def delete_category(self, row_id: int) -> None:
         """Удаляет категорию по ее идентификатору"""
