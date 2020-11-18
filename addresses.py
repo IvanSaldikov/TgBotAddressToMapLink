@@ -22,22 +22,13 @@ class AddressDB(NamedTuple):
 
 class Address():
     """Класс для работы с адресами"""
+
     def __init__(self):
         self.db = DB()
 
     def add_address(self, address: str, link_to_ya_map: str, user_id: int) -> str:
         """Добавляет новый адрес в базу данных.
         Принимает на вход текст сообщения, поступившего на вход в бот"""
-        """
-        inserted_user_id = db.insert('users',
-                        {
-                            "id": user_id,
-                            "created": _get_now_formatted(),
-                            "last_updated": _get_now_formatted(),
-                        }
-                   )
-        """
-
         inserted_id = self.db.insert('addresses',
                         {
                             "address": address,

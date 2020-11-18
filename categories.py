@@ -63,7 +63,7 @@ class Category():
                        f"from categories where user_id = {self.get_user_id()} and id={cat_id} ")
         cursor.execute(sql_str)
         row = cursor.fetchone()
-        if row[1]:
+        if row:
             cat_name = row[1]
         else:
             cat_name = '*UNKNOWN*'

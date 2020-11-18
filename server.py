@@ -72,7 +72,7 @@ async def send_welcome(message: types.Message):
     await message.answer(
         "*GoToYaM Bot*\n\n"
         "Бот для преобразования адреса в ссылку, ведущую на Яндекс.Карты, где находится этот адрес.\n\n"
-        "Добавить адрес: например, _Нахимовский проспект 1_\n\n"
+        "Добавить адрес: например, введите _Нахимовский проспект 1_\n\n"
         "Все мои адреса: /addresses\n\n"
         "Категории адресов: /categories\n\n"
         "Автор: Иван Сальдиков (c) 2020\n"
@@ -179,7 +179,8 @@ async def goto_address(message: types.Message):
 @dp.message_handler(lambda message: message.text.startswith('/showcataddr'))
 async def showcataddr(message: types.Message):
     """Показываем адреса в определенной категории"""
-    cat_id = int(message.text[12:])
+    cat_id = message.text[12:]
+    cat_id = -1 if cat_id == 'None' else int(cat_id)
     cat_name = Category(message.from_user.id).get_category_name(cat_id)
     all_addresses = Address().get_all_addresses(message.from_user.id, cat_id)
     if not all_addresses:
@@ -205,6 +206,14 @@ async def showcataddr(message: types.Message):
     await message.answer(answer_message, parse_mode='Markdown')
 
 
+def show_cat_title(cat_name, cat_id):
+    """Вовзаращаем строку операции для названия категории только если она существует"""
+    if cat_name is not None:
+        return f'Категория: _{cat_name}_ - /showcataddr{cat_id}\n'
+    else:
+        return ''
+
+
 @dp.message_handler(commands=['addresses'])
 async def show_user_addresses(message: types.Message):
     """Отправляет список всех адресов пользователя"""
@@ -219,7 +228,7 @@ async def show_user_addresses(message: types.Message):
 
     addresses_rows = [
         f"*{address_one.address}* - /goto{address_one.id}\n"
-        f"Категория: _{address_one.category_name}_ - /showcataddr{address_one.cat_id}\n"
+        f"{show_cat_title(address_one.category_name, address_one.cat_id)}"  
         f"/addtocat{address_one.id} - добавить этот адрес в категорию\n"
         f"/deladdr{address_one.id} - удалить данный адрес из базы"
         for address_one in all_addresses]
@@ -228,6 +237,14 @@ async def show_user_addresses(message: types.Message):
             "\n\nСписок ваших категорий: /categories" +\
             "\n\nНачальный экран: /start"
     await message.answer(answer_message, parse_mode='Markdown')
+
+
+def show_delcat_title(cat_id, counter):
+    """Вовзаращаем строку операции для удаления категории только если категория НЕ пустая"""
+    if counter == 0:
+        return f"/delcat{cat_id} - удалить данную категорию"
+    else:
+        return ''
 
 
 @dp.message_handler(commands=['categories'])
@@ -245,7 +262,7 @@ async def show_user_categories(message: types.Message):
     categories_rows = [
         f"*{category_one.name}* ({category_one.addr_counter})\n"
         f"/showcataddr{category_one.id} - просмотреть адреса категории\n"
-        f"/delcat{category_one.id} - удалить данную категорию"
+        f"{show_delcat_title(category_one.id, category_one.addr_counter)}"
         for category_one in all_categories]
     answer_message = "Ваш список категорий:\n\n" + "\n\n"\
             .join(categories_rows) + \
@@ -260,7 +277,7 @@ async def add_category(message: types.Message):
     """Переходит в режим добавления категории"""
     global input_mode
     input_mode = 1
-    answer_message = "Отправьте боту название новой категории для добавления\n\n" + \
+    answer_message = "*Отправьте боту название новой категории для добавления*\n\n" + \
             "Список категорий: /categories\n\n" + \
             "Все Ваши адреса: /addresses\n\n" + \
             "Начальный экран: /start\n\n"
@@ -299,7 +316,7 @@ async def add_address(message: types.Message):
             cat_name = message.text
             Category(message.from_user.id).add_category(cat_name)
             answer_message = (
-                f"Новая категория успешно добавлена: *{cat_name}/\n\n"
+                f"Новая категория успешно добавлена: *{cat_name}*\n\n"
                 f"Все Ваши категории: /categories\n\n"
                 f"Все Ваши адреса: /addresses\n\n"
                 f"Главное меню: /start\n\n"

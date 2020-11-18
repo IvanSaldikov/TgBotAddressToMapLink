@@ -21,7 +21,7 @@ class DB:
             f"({columns}) "
             f"VALUES ({placeholders})",
             values)
-        self.conn.commit()
+        return self.conn.commit()
 
     def fetchall(self, table: str, columns: List[str]) -> List[Tuple]:
         columns_joined = ", ".join(columns)
