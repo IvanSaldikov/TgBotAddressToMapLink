@@ -53,3 +53,10 @@ http://gentle-mesa-72344.herokuapp.com/
 
 Установка под Debian:
 https://www.8host.com/blog/ustanovka-i-ispolzovanie-docker-v-debian-9/
+
+
+### Автор
+
+(c) Ivan Saldikov 2020
+
+saldoz@ya.ru

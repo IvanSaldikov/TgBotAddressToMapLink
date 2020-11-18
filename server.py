@@ -2,8 +2,8 @@
 # Этому боту можно отправить строку адреса, а бот вернет ссылку на Яндекс.Карты,
 # по которой можно перейти и посмотреть, что там по этому адресу
 # Бот доступен по адресу @gotoyam_bot или https://t.me/gotoyam_bot.
-# https://www.youtube.com/watch?v=Kh16iosOTIQ
-# https://github.com/alexey-goloburdin/telegram-finance-bot
+#
+# (c) Ivan Saldikov 2020, saldoz@ya.ru
 
 """Сервер Telegram бота, запускаемый непосредственно"""
 import configparser
