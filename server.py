@@ -113,9 +113,11 @@ async def add_to_category(message: types.Message):
     all_categories = Category(message.from_user.id).get_all_categories()
     if not all_categories:
         await message.answer(
-            "Список моих категорий пуст\n\n"
-            "Для добавления категории введите /addcat\n\n"
+            "Список категорий пуст\n\n"
+            "*Для добавления категории введите* /addcat\n\n"
+            "Мои адреса: /addresses\n\n"
             "Начальный экран: /start"
+            , parse_mode='Markdown'
         )
         return
     categories_rows = [
