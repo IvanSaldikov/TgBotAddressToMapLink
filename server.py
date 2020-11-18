@@ -159,7 +159,7 @@ async def goto_address(message: types.Message):
     row_id = int(message.text[5:])
     link_to_yamaps = Address().get_link_ya_map(message.from_user.id, row_id)
     answer_message = (
-        f"Мойа ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
+        f"Ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
         f"Мои адреса: /addresses\n\n"
         f"Главное меню: /start\n\n"
     )
@@ -256,7 +256,7 @@ async def show_user_categories(message: types.Message):
         f"/showcataddr{category_one.id} - просмотреть адреса категории\n"
         f"{show_delcat_title(category_one.id, category_one.addr_counter)}"
         for category_one in all_categories]
-    answer_message = "Мой список категорий:\n\n" + "\n\n" \
+    answer_message = "Список категорий:\n\n" + "\n\n" \
         .join(categories_rows) + \
                      "\n\nДобавить категорию: /addcat" + \
                      "\n\nМои адреса: /addresses" + \
@@ -297,7 +297,7 @@ async def add_address(message: types.Message):
                                   link_to_yamaps,
                                   message.from_user.id)
             answer_message = (
-                f"Мойа ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
+                f"Ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
                 f"Мои адреса: /addresses\n\n"
                 f"Мои категории: /categories\n\n"
                 f"Главное меню: /start\n\n"
