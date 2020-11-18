@@ -293,9 +293,9 @@ async def add_address(message: types.Message):
                     long = arr[0]
                     wide = arr[1]
                     link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
-            Address().add_address(message.text,
-                                  link_to_yamaps,
-                                  message.from_user.id)
+                    Address().add_address(message.text,
+                                          link_to_yamaps,
+                                          message.from_user.id)
             answer_message = (
                 f"Ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
                 f"Мои адреса: /addresses\n\n"
