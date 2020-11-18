@@ -98,7 +98,7 @@ class Address():
         sql_str = ("select a.id, a.address, a.user_id, c.name, c.id "
                    f"from addresses a left join categories c "
                    f"on a.category_id=c.id "
-                   f"where a.user_id = '{int(user_id)}' "
+                   f"where a.user_id = '{int(user_id)}' and a.is_shown=1 "
                    "order by a.address LIMIT 40")
         cursor.execute(sql_str)
         rows = cursor.fetchall()

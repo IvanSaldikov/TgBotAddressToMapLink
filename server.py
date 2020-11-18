@@ -285,7 +285,8 @@ async def add_address(message: types.Message):
         # Добавляем адрес
         if input_mode == 0:
             yandex_map = YandexMap(YANDEX_API_KEY)
-            yandex_answer = yandex_map.get_geocode(message.text)
+            address = str(message.text).replace('*', '')
+            yandex_answer = yandex_map.get_geocode(address)
             link_to_yamaps = 'Ничего не найдено, попробуйте повторить попытку позже'
             is_shown = 0
             # Если пришел нормальный ответ от API (два числа через пробел)
@@ -296,7 +297,7 @@ async def add_address(message: types.Message):
                     wide = arr[1]
                     link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
                     is_shown = 1
-            Address().add_address(message.text,
+            Address().add_address(address,
                                   link_to_yamaps,
                                   message.from_user.id,
                                   is_shown)
