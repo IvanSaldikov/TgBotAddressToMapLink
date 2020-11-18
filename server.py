@@ -224,7 +224,7 @@ async def show_user_addresses(message: types.Message):
             "*Для добавления адреса, просто введите его в строку и отправьте боту*.\n\n"
             "Список моих категорий: /categories\n\n"
             "Начальный экран: /start\n\n"
-        )
+        , parse_mode='Markdown')
         return
 
     addresses_rows = [

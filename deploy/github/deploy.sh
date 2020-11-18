@@ -3,7 +3,7 @@
 # to Prod server and getting up Docker container based on the last sources from repository on GitHub
 # (c) 2020 Ivan Saldikov, saldoz@ya.ru
 
-# working dir
+# working dir = path to docker-compose.yaml file
 cd /home/www/code/tgbots/yandex_tg_bot
 # cloning last repo
 git clone https://github.com/IvanSaldoZ/YandexTgBot
