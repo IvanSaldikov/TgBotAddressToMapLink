@@ -25,7 +25,7 @@ class Address():
     def __init__(self):
         self.db = DB()
 
-    def add_address(self, address: str, link_to_ya_map: str, user_id: int) -> str:
+    def add_address(self, address: str, link_to_ya_map: str, user_id: int, is_shown: int) -> str:
         """Добавляет новый адрес в базу данных.
         Принимает на вход текст сообщения, поступившего на вход в бот"""
         inserted_id = self.db.insert('addresses',
@@ -33,7 +33,8 @@ class Address():
                                          "address": address,
                                          "link_to_ya_map": link_to_ya_map,
                                          "created": get_now_formatted(),
-                                         "user_id": user_id
+                                         "user_id": user_id,
+                                         "is_shown": is_shown
                                      }
                                      )
         return inserted_id

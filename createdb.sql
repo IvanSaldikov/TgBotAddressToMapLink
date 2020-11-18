@@ -8,6 +8,7 @@ create table addresses(
     link_to_ya_map text,
     created datetime,
     category_id integer,
+    is_shown integer default 1 not null,
     FOREIGN KEY(category_id) REFERENCES categories(id)
 );
 

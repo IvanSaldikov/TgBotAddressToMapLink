@@ -280,12 +280,14 @@ async def add_category(message: types.Message):
 async def add_address(message: types.Message):
     """Добавляет новый адрес"""
     global input_mode
+    answer_message = ''
     try:
         # Добавляем адрес
         if input_mode == 0:
             yandex_map = YandexMap(YANDEX_API_KEY)
             yandex_answer = yandex_map.get_geocode(message.text)
             link_to_yamaps = 'Ничего не найдено, попробуйте повторить попытку позже'
+            is_shown = 0
             # Если пришел нормальный ответ от API (два числа через пробел)
             if yandex_answer != -1:
                 arr = str(yandex_answer).split()
@@ -293,29 +295,30 @@ async def add_address(message: types.Message):
                     long = arr[0]
                     wide = arr[1]
                     link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
-                    Address().add_address(message.text,
-                                          link_to_yamaps,
-                                          message.from_user.id)
+                    is_shown = 1
+            Address().add_address(message.text,
+                                  link_to_yamaps,
+                                  message.from_user.id,
+                                  is_shown)
             answer_message = (
                 f"Ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
-                f"Мои адреса: /addresses\n\n"
-                f"Мои категории: /categories\n\n"
-                f"Главное меню: /start\n\n"
             )
         # Добавляем категорию
         elif input_mode == 1:
             input_mode = 0
-            cat_name = message.text
+            cat_name = str(message.text).replace('*', '')
             Category(message.from_user.id).add_category(cat_name)
             answer_message = (
                 f"Новая категория успешно добавлена: *{cat_name}*\n\n"
-                f"Мои категории: /categories\n\n"
-                f"Мои адреса: /addresses\n\n"
-                f"Главное меню: /start\n\n"
             )
     except exceptions.NotCorrectMessage as e:
         await message.answer(str(e))
         return
+    answer_message += (
+        f"Мои адреса: /addresses\n\n"
+        f"Мои категории: /categories\n\n"
+        f"Главное меню: /start\n\n"
+    )
     await message.answer(answer_message, parse_mode='Markdown')
 
 
