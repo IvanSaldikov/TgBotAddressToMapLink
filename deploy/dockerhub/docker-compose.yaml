@@ -1,6 +1,6 @@
 version: "3"
 services:
-  YandexTgBot:
+  yandex_tg_bot:
     image: klezcool/yandex_bot
     restart: always
     volumes:
