@@ -13,9 +13,9 @@ class DB:
 
     def insert(self, table: str, column_values: Dict):
         cursor = self.cursor
-        columns = ', '.join( column_values.keys() )
+        columns = ', '.join(column_values.keys())
         values = [tuple(column_values.values())]
-        placeholders = ", ".join( "?" * len(column_values.keys()) )
+        placeholders = ", ".join("?" * len(column_values.keys()))
         cursor.executemany(
             f"INSERT INTO {table} "
             f"({columns}) "

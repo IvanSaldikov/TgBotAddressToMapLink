@@ -1,7 +1,6 @@
 from addresses import Address, AddressDB
 from db import DB
 
-
 from pytest import approx
 
 
@@ -22,8 +21,8 @@ class TestAddress():
     def test_add_address_to_db(self):
         """Добавление адреса в базу данных"""
         ret = self.address.add_address('message.text',
-                                          'link_to_yamaps',
-                                          99999999)
+                                       'link_to_yamaps',
+                                       99999999)
         assert ret is None
 
     def teardown_class(self):
@@ -33,6 +32,3 @@ class TestAddress():
                                      "and user_id=99999999")
         cursor.fetchall()
         self.conn.commit()
-
-
-

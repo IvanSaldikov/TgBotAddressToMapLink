@@ -1,6 +1,7 @@
 import datetime
 import pytz
 
+
 def get_now_formatted() -> str:
     """Возвращает сегодняшнюю дату строкой"""
     return _get_now_datetime().strftime("%Y-%m-%d %H:%M:%S")

@@ -2,7 +2,6 @@ import datetime
 import re
 from typing import List, NamedTuple, Optional
 
-
 from db import DB
 import exceptions
 
@@ -30,15 +29,14 @@ class Address():
         """Добавляет новый адрес в базу данных.
         Принимает на вход текст сообщения, поступившего на вход в бот"""
         inserted_id = self.db.insert('addresses',
-                        {
-                            "address": address,
-                            "link_to_ya_map": link_to_ya_map,
-                            "created": get_now_formatted(),
-                            "user_id": user_id
-                        }
-                   )
+                                     {
+                                         "address": address,
+                                         "link_to_ya_map": link_to_ya_map,
+                                         "created": get_now_formatted(),
+                                         "user_id": user_id
+                                     }
+                                     )
         return inserted_id
-
 
     def get_all_addresses(self, user_id, cat_id=None) -> List[AddressDB]:
         """Возвращает список всех адресов, введенных пользователем"""
@@ -60,19 +58,17 @@ class Address():
                                cat_id=-1) for row in rows]
         return addresses
 
-
     def delete_address(self, row_id: int) -> None:
         """Удаляет адрес по его идентификатору"""
         self.db.delete("addresses", row_id)
-
 
     def get_link_ya_map(self, user_id, row_id):
         """Возвращаем ссылку на Яндекс.Карты"""
         db = self.db
         cursor = db.get_cursor()
         sql_str = ("select id, link_to_ya_map, user_id "
-                       f"from addresses where user_id = {int(user_id)} "
-                       f"AND id={row_id}")
+                   f"from addresses where user_id = {int(user_id)} "
+                   f"AND id={row_id}")
         cursor.execute(sql_str)
         result = cursor.fetchone()
         if not result[1]:
@@ -80,14 +76,13 @@ class Address():
         link_to_ya_map = result[1] if result[1] else 0
         return link_to_ya_map
 
-
     def get_name_by_id(self, user_id: int, addr_id: int) -> str:
         """Возвращаем название адреса по его id"""
         db = self.db
         cursor = db.get_cursor()
         sql_str = ("select id, address, user_id "
-                       f"from addresses where user_id = {int(user_id)} "
-                       f"AND id={int(addr_id)}")
+                   f"from addresses where user_id = {int(user_id)} "
+                   f"AND id={int(addr_id)}")
         cursor.execute(sql_str)
         result = cursor.fetchone()
         if not result[1]:
@@ -100,10 +95,10 @@ class Address():
         db = self.db
         cursor = db.cursor
         sql_str = ("select a.id, a.address, a.user_id, c.name, c.id "
-                       f"from addresses a left join categories c "
-                       f"on a.category_id=c.id "
-                       f"where a.user_id = '{int(user_id)}' "
-                       "order by a.address LIMIT 40")
+                   f"from addresses a left join categories c "
+                   f"on a.category_id=c.id "
+                   f"where a.user_id = '{int(user_id)}' "
+                   "order by a.address LIMIT 40")
         cursor.execute(sql_str)
         rows = cursor.fetchall()
         addresses = [AddressDB(id=row[0],
@@ -113,4 +108,3 @@ class Address():
                                category_name=row[3],
                                cat_id=row[4]) for row in rows]
         return addresses
-

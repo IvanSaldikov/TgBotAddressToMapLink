@@ -2,8 +2,10 @@
 
 import requests
 
+
 class YandexMap:
     """Класс для работы с Я.Картами"""
+
     # https://yandex.ru/dev/maps/geocoder/doc/desc/examples/geocoder_examples.html/
     # https://developer.tech.yandex.ru/services/3
     # https://pypi.org/project/yandex-maps/ (только для второй версии Python)

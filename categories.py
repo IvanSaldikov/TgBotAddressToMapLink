@@ -60,7 +60,7 @@ class Category():
         db = self.db
         cursor = db.get_cursor()
         sql_str = ("select id, name, user_id "
-                       f"from categories where user_id = {self.get_user_id()} and id={cat_id} ")
+                   f"from categories where user_id = {self.get_user_id()} and id={cat_id} ")
         cursor.execute(sql_str)
         row = cursor.fetchone()
         if row:
@@ -106,4 +106,3 @@ class Category():
         else:
             cat_counter = 0
         return cat_counter
-

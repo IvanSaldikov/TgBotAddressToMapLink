@@ -19,7 +19,6 @@ from categories import Category
 from addresses import Address
 import exceptions
 
-
 input_mode = 0
 proxy_enabled = False
 logging.basicConfig(level=logging.INFO)
@@ -52,7 +51,6 @@ if YANDEX_API_KEY is None:
         print('Error: YANDEX_API_KEY not set not in Envoronment nor in .env file.')
         exit(101)
 
-
 bot = Bot(token=TELEGRAM_API_TOKEN, proxy=PROXY_URL)
 dp = Dispatcher(bot)
 
@@ -68,7 +66,7 @@ async def send_welcome(message: types.Message):
         "Категории адресов: /categories\n\n"
         "Автор: Иван Сальдиков (c) 2020\n"
         "saldoz@ya.ru"
-    , parse_mode='Markdown')
+        , parse_mode='Markdown')
 
 
 @dp.message_handler(lambda message: message.text.startswith('/deladdr'))
@@ -80,7 +78,7 @@ async def del_address(message: types.Message):
         f'Адрес был успешно *удален*\n\n'
         f"Мои адреса: /addresses\n\n"
         f"Главное меню: /start\n\n"
-        )
+    )
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -103,7 +101,7 @@ async def del_category(message: types.Message):
         f"Мои адреса: /addresses\n\n"
         f"Мои категории: /categories\n\n"
         f"Главное меню: /start\n\n"
-        )
+    )
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -123,11 +121,11 @@ async def add_to_category(message: types.Message):
     categories_rows = [
         f"*{category_one.name}* - /choosecat{addr_id}to{category_one.id}\n"
         for category_one in all_categories]
-    answer_message = f"Выберите категорию, в которую необходимо переместить адрес *{addr_name}*:\n\n" + "\n\n"\
-            .join(categories_rows) + \
-            "\n\nНачальный экран: /start" + \
-            "\n\nМои адреса: /addresses" + \
-            "\n\nМои категории: /categories"
+    answer_message = f"Выберите категорию, в которую необходимо переместить адрес *{addr_name}*:\n\n" + "\n\n" \
+        .join(categories_rows) + \
+                     "\n\nНачальный экран: /start" + \
+                     "\n\nМои адреса: /addresses" + \
+                     "\n\nМои категории: /categories"
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -148,10 +146,9 @@ async def change_addr_cat(message: types.Message):
         answer_message = f"Ошибка при передаче параметров"
 
     answer_message += "\n\nМои адреса: /addresses" + \
-                        "\n\nМои категории: /categories" + \
-                        "\n\nНачальный экран: /start"
+                      "\n\nМои категории: /categories" + \
+                      "\n\nНачальный экран: /start"
     await message.answer(answer_message, parse_mode='Markdown')
-
 
 
 @dp.message_handler(lambda message: message.text.startswith('/goto'))
@@ -163,7 +160,7 @@ async def goto_address(message: types.Message):
         f"Мойа ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
         f"Мои адреса: /addresses\n\n"
         f"Главное меню: /start\n\n"
-        )
+    )
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -181,7 +178,7 @@ async def showcataddr(message: types.Message):
             "Список моих адресов: /addresses\n\n"
             "Список моих категорий: /categories\n\n"
             "Начальный экран: /start"
-        , parse_mode='Markdown')
+            , parse_mode='Markdown')
         return
 
     addresses_rows = [
@@ -190,8 +187,8 @@ async def showcataddr(message: types.Message):
         f"/deladdr{address_one.id} - удалить данный адрес из базы"
         for address_one in all_addresses]
     answer_message = f"Список адресов в категории *{cat_name}*:\n\n" + "\n\n" \
-                    .join(addresses_rows) + \
-                    "\n\nСписок моих категорий: /categories" + \
+        .join(addresses_rows) + \
+                     "\n\nСписок моих категорий: /categories" + \
                      "\n\nСписок моих адресов: /addresses" + \
                      "\n\nНачальный экран: /start"
     await message.answer(answer_message, parse_mode='Markdown')
@@ -215,19 +212,19 @@ async def show_user_addresses(message: types.Message):
             "*Для добавления адреса, просто введите его в строку и отправьте боту*.\n\n"
             "Список моих категорий: /categories\n\n"
             "Начальный экран: /start\n\n"
-        , parse_mode='Markdown')
+            , parse_mode='Markdown')
         return
 
     addresses_rows = [
         f"*{address_one.address}* - /goto{address_one.id}\n"
-        f"{show_cat_title(address_one.category_name, address_one.cat_id)}"  
+        f"{show_cat_title(address_one.category_name, address_one.cat_id)}"
         f"/addtocat{address_one.id} - добавить этот адрес в категорию\n"
         f"/deladdr{address_one.id} - удалить данный адрес из базы"
         for address_one in all_addresses]
-    answer_message = "Мой список адресов:\n\n" + "\n\n"\
-            .join(addresses_rows) + \
-            "\n\nСписок моих категорий: /categories" +\
-            "\n\nНачальный экран: /start"
+    answer_message = "Мой список адресов:\n\n" + "\n\n" \
+        .join(addresses_rows) + \
+                     "\n\nСписок моих категорий: /categories" + \
+                     "\n\nНачальный экран: /start"
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -256,11 +253,11 @@ async def show_user_categories(message: types.Message):
         f"/showcataddr{category_one.id} - просмотреть адреса категории\n"
         f"{show_delcat_title(category_one.id, category_one.addr_counter)}"
         for category_one in all_categories]
-    answer_message = "Мой список категорий:\n\n" + "\n\n"\
-            .join(categories_rows) + \
-            "\n\nДобавить категорию: /addcat" + \
-            "\n\nМои адреса: /addresses" + \
-            "\n\nНачальный экран: /start"
+    answer_message = "Мой список категорий:\n\n" + "\n\n" \
+        .join(categories_rows) + \
+                     "\n\nДобавить категорию: /addcat" + \
+                     "\n\nМои адреса: /addresses" + \
+                     "\n\nНачальный экран: /start"
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -270,9 +267,9 @@ async def add_category(message: types.Message):
     global input_mode
     input_mode = 1
     answer_message = "*Отправьте боту название новой категории для добавления*\n\n" + \
-            "Список категорий: /categories\n\n" + \
-            "Мои адреса: /addresses\n\n" + \
-            "Начальный экран: /start\n\n"
+                     "Список категорий: /categories\n\n" + \
+                     "Мои адреса: /addresses\n\n" + \
+                     "Начальный экран: /start\n\n"
     await message.answer(answer_message, parse_mode='Markdown')
 
 
@@ -294,8 +291,8 @@ async def add_address(message: types.Message):
                     wide = arr[1]
                     link_to_yamaps = yandex_map.form_href_to_yamap(long, wide)
             Address().add_address(message.text,
-                                          link_to_yamaps,
-                                          message.from_user.id)
+                                  link_to_yamaps,
+                                  message.from_user.id)
             answer_message = (
                 f"Мойа ссылка на Яндекс.Карты: {link_to_yamaps}.\n\n"
                 f"Мои адреса: /addresses\n\n"
@@ -321,4 +318,3 @@ async def add_address(message: types.Message):
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
-
