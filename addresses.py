@@ -41,16 +41,13 @@ class Address():
 
     def get_all_addresses(self, user_id, cat_id=None) -> List[AddressDB]:
         """Возвращает список всех адресов, введенных пользователем"""
-        db = self.db
-        cursor = db.get_cursor()
         added_sql_str = ''
         if cat_id is not None:
             added_sql_str = f' and category_id={cat_id}'
 
-        cursor.execute("select id, address, link_to_ya_map, user_id "
+        rows = self.db.conn_new.execute("select id, address, link_to_ya_map, user_id "
                        f"from addresses where `user_id` = '{user_id}'{added_sql_str} "
                        "order by address LIMIT 40")
-        rows = cursor.fetchall()
         addresses = [AddressDB(id=row[0],
                                address=row[1],
                                link_to_ya_map=row[2],
@@ -65,43 +62,34 @@ class Address():
 
     def get_link_ya_map(self, user_id, row_id):
         """Возвращаем ссылку на Яндекс.Карты"""
-        db = self.db
-        cursor = db.get_cursor()
         sql_str = ("select id, link_to_ya_map, user_id "
                    f"from addresses where user_id = {int(user_id)} "
                    f"AND id={row_id}")
-        cursor.execute(sql_str)
-        result = cursor.fetchone()
-        if not result[1]:
-            return "Ссылка не найдена"
-        link_to_ya_map = result[1] if result[1] else 0
+        result = self.db.conn_new.execute(sql_str)
+        link_to_ya_map = "Ссылка не найдена"
+        for row in result:
+            link_to_ya_map = row if row else link_to_ya_map
         return link_to_ya_map
 
     def get_name_by_id(self, user_id: int, addr_id: int) -> str:
         """Возвращаем название адреса по его id"""
-        db = self.db
-        cursor = db.get_cursor()
         sql_str = ("select id, address, user_id "
                    f"from addresses where user_id = {int(user_id)} "
                    f"AND id={int(addr_id)}")
-        cursor.execute(sql_str)
-        result = cursor.fetchone()
-        if not result[1]:
-            return "Адрес не найден"
-        address_name = result[1] if result[1] else 0
+        result = self.db.conn_new.execute(sql_str)
+        address_name = "Адрес не найден"
+        for row in result:
+            address_name = row if row else address_name
         return address_name
 
     def get_all_addresses_and_cats(self, user_id: int) -> List[AddressDB]:
         """Возвращает список всех адресов, введенных пользователем, с указанием категорий"""
-        db = self.db
-        cursor = db.cursor
         sql_str = ("select a.id, a.address, a.user_id, c.name, c.id "
                    f"from addresses a left join categories c "
                    f"on a.category_id=c.id "
                    f"where a.user_id = '{int(user_id)}' and a.is_shown=1 "
                    "order by a.address LIMIT 40")
-        cursor.execute(sql_str)
-        rows = cursor.fetchall()
+        rows = self.db.conn_new.execute(sql_str)
         addresses = [AddressDB(id=row[0],
                                address=row[1],
                                link_to_ya_map='',
