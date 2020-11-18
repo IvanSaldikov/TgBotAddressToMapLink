@@ -1,16 +1,17 @@
 # Основной и единственный модуль программы Телеграм-бота (бакэнд).
 # Этому боту можно отправить строку адреса, а бот вернет ссылку на Яндекс.Карты,
 # по которой можно перейти и посмотреть, что там по этому адресу
+# Также бот умеет сохранять введенные адреса, ссылки, категории.
 # Бот доступен по адресу @gotoyam_bot или https://t.me/gotoyam_bot.
 #
 # (c) Ivan Saldikov 2020, saldoz@ya.ru
 
-"""Сервер Telegram бота, запускаемый непосредственно"""
+"""Сервер Telegram бота, непосредственно запускаемый"""
 import configparser
 import logging
 import os
-from typing import NamedTuple
 
+import aiohttp
 from aiogram import Bot, Dispatcher, executor, types
 
 from yandex import YandexMap
@@ -19,51 +20,41 @@ from addresses import Address
 import exceptions
 
 
-class BotState():
-    input_mode: 0
-
 input_mode = 0
-
-class InputMode(NamedTuple):
-    """Структура режима ввода"""
-    id: int
-    name: str
-
-
+proxy_enabled = False
 logging.basicConfig(level=logging.INFO)
 
-API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
+TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
 PROXY_URL = os.getenv("TELEGRAM_PROXY_URL")
-YANDEX_TOKEN = os.getenv("YANDEX_API_KEY")
-#PROXY_AUTH = aiohttp.BasicAuth(
-#    login=os.getenv("TELEGRAM_PROXY_LOGIN"),
-#    password=os.getenv("TELEGRAM_PROXY_PASSWORD")
-#)
+YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
+if proxy_enabled:
+    PROXY_AUTH = aiohttp.BasicAuth(
+        login=os.getenv("TELEGRAM_PROXY_LOGIN"),
+        password=os.getenv("TELEGRAM_PROXY_PASSWORD")
+    )
 
-# Если Windows - то пытаемся читать из файла окружения
-if API_TOKEN == None:
+# Если нет токенов в переменных окрежния - то пытаемся читать из файла окружения
+if TELEGRAM_API_TOKEN is None:
     tokens = configparser.ConfigParser()
-    tokens.read('.env')
-    API_TOKEN = tokens.get('KEYS', 'TELEGRAM_API_TOKEN')
+    try:
+        tokens.read('.env')
+        TELEGRAM_API_TOKEN = tokens.get('KEYS', 'TELEGRAM_API_TOKEN')
+    except exceptions.NotCorrectMessage as e:
+        print('Error: TELEGRAM_API_TOKEN not set not in Envoronment nor in .env file.')
+        exit(100)
 
-if YANDEX_TOKEN == None:
+if YANDEX_API_KEY is None:
     tokens = configparser.ConfigParser()
-    tokens.read('.env')
-    YANDEX_TOKEN = tokens.get('KEYS', 'YANDEX_API_KEY')
+    try:
+        tokens.read('.env')
+        YANDEX_API_KEY = tokens.get('KEYS', 'YANDEX_API_KEY')
+    except exceptions.NotCorrectMessage as e:
+        print('Error: YANDEX_API_KEY not set not in Envoronment nor in .env file.')
+        exit(101)
 
-#print('TELEGRAM_API_TOKEN', API_TOKEN)
-#print('YANDEX_API_TOKEN', YANDEX_TOKEN)
 
-bot = Bot(token=API_TOKEN, proxy=PROXY_URL)
+bot = Bot(token=TELEGRAM_API_TOKEN, proxy=PROXY_URL)
 dp = Dispatcher(bot)
-
-
-inputmodes = [
-    InputMode(id = 0, name="ADD_ADDRESS"),
-    InputMode(id = 1, name="ADD_CATEGORY"),
-    InputMode(id = 2, name="CHANGE_CAT"),
-]
-
 
 
 @dp.message_handler(commands=['start', 'help'])
@@ -292,7 +283,7 @@ async def add_address(message: types.Message):
     try:
         # Добавляем адрес
         if input_mode == 0:
-            yandex_map = YandexMap(YANDEX_TOKEN)
+            yandex_map = YandexMap(YANDEX_API_KEY)
             yandex_answer = yandex_map.get_geocode(message.text)
             link_to_yamaps = 'Ничего не найдено, попробуйте повторить попытку позже'
             # Если пришел нормальный ответ от API (два числа через пробел)
