@@ -210,7 +210,7 @@ async def show_user_addresses(message: types.Message):
     all_addresses = Address().get_all_addresses_and_cats(message.from_user.id)
     if not all_addresses:
         await message.answer(
-            "Список адресов пуст\n\n"
+            "Список адресов пуст.\n\n"
             "*Для добавления адреса, просто введите его в строку и отправьте боту*.\n\n"
             "Список моих категорий: /categories\n\n"
             "Начальный экран: /start\n\n"
@@ -244,10 +244,11 @@ async def show_user_categories(message: types.Message):
     all_categories = Category(message.from_user.id).get_all_categories()
     if not all_categories:
         await message.answer(
-            "Список моих категорий пуст\n\n"
-            "Для добавления категории введите /addcat\n\n"
+            "Список категорий пуст.\n\n"
+            "*Для добавления категории введите* /addcat\n\n"
             "Мои адреса: /addresses\n\n"
             "Начальный экран: /start"
+            , parse_mode='Markdown'
         )
         return
     categories_rows = [
