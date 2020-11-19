@@ -1,11 +1,8 @@
-import datetime
-import re
 from typing import List, NamedTuple, Optional
 
 from db import DB
-import exceptions
 
-from categories import CategoryDB
+
 from datetime_fmt import get_now_formatted
 
 
@@ -85,7 +82,7 @@ class Address():
     def get_all_addresses_and_cats(self, user_id: int) -> List[AddressDB]:
         """Возвращает список всех адресов, введенных пользователем, с указанием категорий"""
         sql_str = ("select a.id, a.address, a.user_id, c.name, c.id "
-                   f"from addresses a left join categories c "
+                   f"from addresses as a left join categories as c "
                    f"on a.category_id=c.id "
                    f"where a.user_id = '{int(user_id)}' and a.is_shown=1 "
                    "order by a.address LIMIT 40")

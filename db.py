@@ -1,17 +1,17 @@
-import os
-from typing import Dict, List, Tuple
-import sqlalchemy as sa
 
-import sqlite3
+from typing import Dict
+import sqlalchemy as sa
 
 
 class DB:
     """Класс для работы с базой данных"""
 
-    def __init__(self):
-        #self.conn = sqlite3.connect(os.path.join("db", "addresses.db"))
-        self.conn_new = sa.create_engine('sqlite:///db/addresses.db')
-        #self.cursor = self.conn.cursor()
+    def __init__(self, is_sqlite3=False):
+        if is_sqlite3:
+            db_conn_str = 'sqlite:///db/addresses.db'
+        else:
+            db_conn_str = 'postgresql+psycopg2://postgres:postgres@localhost/postgres'
+        self.conn_new = sa.create_engine(db_conn_str)
         #self.check_db_exists()
 
     def insert(self, table: str, column_values: Dict):
@@ -31,14 +31,17 @@ class DB:
 
     def _init_db(self):
         """Инициализирует БД"""
-        with open("createdb.sql", "r") as f:
+        with open("createdb_postgresql.sql", "r") as f:
             sql = f.read()
         self.conn_new.execute(sql)
 
     def check_db_exists(self):
         """Проверяет, инициализирована ли БД, если нет — инициализирует"""
-        table_exists = self.conn_new.execute("SELECT name FROM sqlite_master "
-                       "WHERE type='table' AND name='addresses'")
+        sql_str = "SELECT * FROM sqlite_master WHERE type='table' AND name='addresses'"
+        sql_str = ('SELECT table_name FROM information_schema.tables WHERE table_schema='
+        'public'
+        ' and table_name=\'addresses\';')
+        table_exists = self.conn_new.execute(sql_str)
         for row in table_exists:
             if row:
                 return
