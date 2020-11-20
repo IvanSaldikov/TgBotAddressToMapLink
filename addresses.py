@@ -43,7 +43,7 @@ class Address():
             added_sql_str = f' and category_id={cat_id}'
 
         rows = self.db.conn_new.execute("select id, address, link_to_ya_map, user_id "
-                       f"from addresses where `user_id` = '{user_id}'{added_sql_str} "
+                       f"from addresses where user_id = {user_id}{added_sql_str} "
                        "order by address LIMIT 40")
         addresses = [AddressDB(id=row[0],
                                address=row[1],
@@ -65,7 +65,7 @@ class Address():
         result = self.db.conn_new.execute(sql_str)
         link_to_ya_map = "Ссылка не найдена"
         for row in result:
-            link_to_ya_map = row if row else link_to_ya_map
+            link_to_ya_map = row[1] if row else link_to_ya_map
         return link_to_ya_map
 
     def get_name_by_id(self, user_id: int, addr_id: int) -> str:
@@ -76,7 +76,7 @@ class Address():
         result = self.db.conn_new.execute(sql_str)
         address_name = "Адрес не найден"
         for row in result:
-            address_name = row if row else address_name
+            address_name = row[1] if row else address_name
         return address_name
 
     def get_all_addresses_and_cats(self, user_id: int) -> List[AddressDB]:

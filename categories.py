@@ -25,7 +25,7 @@ class Category():
         """Возвращает справочник категорий адресов из БД для данного пользователя
          с указанием количества адресов в данной категории"""
         db = self.db
-        sql_str = (f"select c.id, c.name, c.user_id, IFNULL(adr_cnt.cnt, 0) as cnt "
+        sql_str = (f"select c.id, c.name, c.user_id, coalesce(adr_cnt.cnt, 0) as cnt "
                    f"from categories as c "
                    f"left join ("
                    f"SELECT a.category_id, COUNT(*) as cnt "
