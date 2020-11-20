@@ -1,18 +1,19 @@
 
 from typing import Dict
 import sqlalchemy as sa
-from config import DB_HOST, DB_PASSWORD, DB_NAME, DB_USER
+from config import DB_HOST, DB_PASSWORD, DB_NAME, DB_USER, DB_TYPE
 
 
 class DB:
     """Класс для работы с базой данных"""
 
-    def __init__(self, is_sqlite3=False):
-        if is_sqlite3:
+    def __init__(self):
+        # Подключаемся к базе данных SQLite3 или Postgres
+        if DB_TYPE == 0:
             db_conn_str = 'sqlite:///db/addresses.db'
         else:
             db_conn_str = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
-        self.conn_new = sa.create_engine(db_conn_str)
+        self.conn = sa.create_engine(db_conn_str)
         #self.check_db_exists()
 
     def insert(self, table: str, column_values: Dict):
@@ -24,17 +25,17 @@ class DB:
             f"({columns}) "
             f"VALUES ({placeholders})"
         )
-        return self.conn_new.execute(ins, values)
+        return self.conn.execute(ins, values)
 
     def delete(self, table: str, row_id: int) -> None:
         row_id = int(row_id)
-        self.conn_new.execute(f"delete from {table} where id={row_id}")
+        self.conn.execute(f"delete from {table} where id={row_id}")
 
     def _init_db(self):
         """Инициализирует БД"""
         with open("createdb_postgresql.sql", "r") as f:
             sql = f.read()
-        self.conn_new.execute(sql)
+        self.conn.execute(sql)
 
     def check_db_exists(self):
         """Проверяет, инициализирована ли БД, если нет — инициализирует"""
@@ -42,7 +43,7 @@ class DB:
         sql_str = ('SELECT table_name FROM information_schema.tables WHERE table_schema='
         'public'
         ' and table_name=\'addresses\';')
-        table_exists = self.conn_new.execute(sql_str)
+        table_exists = self.conn.execute(sql_str)
         for row in table_exists:
             if row:
                 return

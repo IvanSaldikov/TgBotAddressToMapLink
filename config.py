@@ -23,4 +23,4 @@ DB_HOST = env.str("DB_HOST")
 DB_USER = env.str("DB_USER")
 DB_PASSWORD = env.str("DB_PASSWORD")
 DB_NAME = env.str("DB_NAME")
-
+DB_TYPE = 1  # Database type: 1 - Postgresql, 0 - SQLite3

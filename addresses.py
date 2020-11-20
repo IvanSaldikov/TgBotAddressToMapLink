@@ -42,7 +42,7 @@ class Address():
         if cat_id is not None:
             added_sql_str = f' and category_id={cat_id}'
 
-        rows = self.db.conn_new.execute("select id, address, link_to_ya_map, user_id "
+        rows = self.db.conn.execute("select id, address, link_to_ya_map, user_id "
                        f"from addresses where user_id = {user_id}{added_sql_str} "
                        "order by address LIMIT 40")
         addresses = [AddressDB(id=row[0],
@@ -62,7 +62,7 @@ class Address():
         sql_str = ("select id, link_to_ya_map, user_id "
                    f"from addresses where user_id = {int(user_id)} "
                    f"AND id={row_id}")
-        result = self.db.conn_new.execute(sql_str)
+        result = self.db.conn.execute(sql_str)
         link_to_ya_map = "Ссылка не найдена"
         for row in result:
             link_to_ya_map = row[1] if row else link_to_ya_map
@@ -73,7 +73,7 @@ class Address():
         sql_str = ("select id, address, user_id "
                    f"from addresses where user_id = {int(user_id)} "
                    f"AND id={int(addr_id)}")
-        result = self.db.conn_new.execute(sql_str)
+        result = self.db.conn.execute(sql_str)
         address_name = "Адрес не найден"
         for row in result:
             address_name = row[1] if row else address_name
@@ -86,7 +86,7 @@ class Address():
                    f"on a.category_id=c.id "
                    f"where a.user_id = '{int(user_id)}' and a.is_shown=1 "
                    "order by a.address LIMIT 40")
-        rows = self.db.conn_new.execute(sql_str)
+        rows = self.db.conn.execute(sql_str)
         addresses = [AddressDB(id=row[0],
                                address=row[1],
                                link_to_ya_map='',
