@@ -7,51 +7,24 @@
 # (c) Ivan Saldikov 2020, saldoz@ya.ru
 
 """Сервер Telegram бота, непосредственно запускаемый"""
-import configparser
 import logging
-import os
 
-import aiohttp
+
 from aiogram import Bot, Dispatcher, executor, types
 
+from config import TELEGRAM_API_TOKEN, PROXY_URL, PROXY_AUTH, YANDEX_API_KEY
 from yandex import YandexMap
 from categories import Category
 from addresses import Address
 import exceptions
 
 input_mode = 0
-proxy_enabled = False
+
 logging.basicConfig(level=logging.INFO)
 
-TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
-PROXY_URL = os.getenv("TELEGRAM_PROXY_URL")
-YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
-if proxy_enabled:
-    PROXY_AUTH = aiohttp.BasicAuth(
-        login=os.getenv("TELEGRAM_PROXY_LOGIN"),
-        password=os.getenv("TELEGRAM_PROXY_PASSWORD")
-    )
+# Читаем настройки из переменных окружения или если есть - то из .env-файла
 
-# Если нет токенов в переменных окрежния - то пытаемся читать из файла окружения
-if TELEGRAM_API_TOKEN is None:
-    tokens = configparser.ConfigParser()
-    try:
-        tokens.read('.env')
-        TELEGRAM_API_TOKEN = tokens.get('KEYS', 'TELEGRAM_API_TOKEN')
-    except exceptions.NotCorrectMessage as e:
-        print('Error: TELEGRAM_API_TOKEN not set not in Envoronment nor in .env file.')
-        exit(100)
-
-if YANDEX_API_KEY is None:
-    tokens = configparser.ConfigParser()
-    try:
-        tokens.read('.env')
-        YANDEX_API_KEY = tokens.get('KEYS', 'YANDEX_API_KEY')
-    except exceptions.NotCorrectMessage as e:
-        print('Error: YANDEX_API_KEY not set not in Envoronment nor in .env file.')
-        exit(101)
-
-bot = Bot(token=TELEGRAM_API_TOKEN, proxy=PROXY_URL)
+bot = Bot(token=TELEGRAM_API_TOKEN, proxy=PROXY_URL, proxy_auth=PROXY_AUTH)
 dp = Dispatcher(bot)
 
 

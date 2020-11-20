@@ -1,6 +1,7 @@
 
 from typing import Dict
 import sqlalchemy as sa
+from config import DB_HOST, DB_PASSWORD, DB_NAME, DB_USER
 
 
 class DB:
@@ -10,7 +11,7 @@ class DB:
         if is_sqlite3:
             db_conn_str = 'sqlite:///db/addresses.db'
         else:
-            db_conn_str = 'postgresql+psycopg2://postgres:postgres@localhost/postgres'
+            db_conn_str = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
         self.conn_new = sa.create_engine(db_conn_str)
         #self.check_db_exists()
 
