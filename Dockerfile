@@ -20,4 +20,6 @@ RUN mkdir db
 #COPY db/* ./db/
 #RUN cat ./createdb_postgresql.sql | sqlite3  ./db/addresses.db
 
+EXPOSE 5432
+
 ENTRYPOINT ["python3", "server.py"]

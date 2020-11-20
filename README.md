@@ -10,6 +10,7 @@ https://www.youtube.com/watch?v=Kh16iosOTIQ - Пишем Telegram бот для 
 
 https://github.com/alexey-goloburdin/telegram-finance-bot - исходники, на основе которых создавался бот
 
+https://github.com/IvanSaldoZ/YandexTgBot - последние исходники данного бота.
 
 #### Работа с API Яндекс-карт:
 
@@ -29,20 +30,12 @@ https://yandex.ru/blog/mapsapi/18681
 
 ### Требования
 
-- Python 3.8
-- pyTelegramBotAPI
+- Тестировалось на Python 3.8 и Python 3.9
 
-### Установка зависимостей
-
-pip install pyTelegramBotAPI
 
 ### Хостинг
 
-Размещен на Heroku
-
-https://dashboard.heroku.com/apps/gentle-mesa-72344/deploy/heroku-git
-
-http://gentle-mesa-72344.herokuapp.com/
+Размещен на Yandex.Cloud
 
 
 #### Docker 
