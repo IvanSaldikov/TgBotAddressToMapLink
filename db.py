@@ -19,13 +19,18 @@ class DB:
     def insert(self, table: str, column_values: Dict):
         columns = ', '.join(column_values.keys())
         values = [tuple(column_values.values())]
-        placeholders = ", ".join("?" * len(column_values.keys()))
-        ins = (
+        #placeholders = ", ".join("?" * len(column_values.keys()))
+        sql_str = (
             f"INSERT INTO {table} "
             f"({columns}) "
-            f"VALUES ({placeholders})"
+            f"VALUES {values[0]}"
         )
-        return self.conn.execute(ins, values)
+        # Обязательно надо передать, потому что Python преобразует
+        # знаки доллара % Python думает, что мы хотим передать в строку параметры,
+        # а нам нужно оставить строку, для этого в SQLAlchemy есть специальный метод text
+        # для преобразования текста
+        sql_str = sa.text(sql_str)
+        return self.conn.execute(sql_str)
 
     def delete(self, table: str, row_id: int) -> None:
         row_id = int(row_id)

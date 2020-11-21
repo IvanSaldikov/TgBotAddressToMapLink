@@ -1,6 +1,7 @@
 # Класс для работы с картами Яндекса
 
 import requests
+import sqlalchemy
 
 
 class YandexMap:
@@ -29,4 +30,4 @@ class YandexMap:
         """Формируем ссылку на карты для перехода"""
         # https://yandex.ru/blog/mapsapi/18681
         # http://maps.yandex.ru/?ll=30.373136,60.006291&spn=0.067205,0.018782&z=15&l=map,stv,pht
-        return f"http://maps.yandex.ru/?ll={long},{wide}&spn=0.067205,0.018782&z=15&l=map,stv,pht&text={wide}%20{long}"
+        return f"http://maps.yandex.ru/?ll={long},{wide}&spn=0.067205,0.018782&z=15&l=map,stv&text={wide}%20{long}"
