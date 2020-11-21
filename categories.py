@@ -1,8 +1,10 @@
 """Работа с категориями адресов"""
 from typing import Dict, List, NamedTuple, Union
 
+from config import DB_TYPE
 from db import DB
 from datetime_fmt import get_now_formatted
+
 
 
 class CategoryDB(NamedTuple):
@@ -25,7 +27,9 @@ class Category():
         """Возвращает справочник категорий адресов из БД для данного пользователя
          с указанием количества адресов в данной категории"""
         db = self.db
-        sql_str = (f"select c.id, c.name, c.user_id, coalesce(adr_cnt.cnt, 0) as cnt "
+        # В случае SQLite3 проверка на NULL осуществляется через IFNULL, для Postgres - через coalesce
+        if_null_str = 'IFNULL' if DB_TYPE == 0 else 'coalesce'
+        sql_str = (f"select c.id, c.name, c.user_id, {if_null_str}(adr_cnt.cnt, 0) as cnt "
                    f"from categories as c "
                    f"left join ("
                    f"SELECT a.category_id, COUNT(*) as cnt "

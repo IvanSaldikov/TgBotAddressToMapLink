@@ -33,16 +33,22 @@ class DB:
 
     def _init_db(self):
         """Инициализирует БД"""
-        with open("createdb_postgresql.sql", "r") as f:
+        if DB_TYPE == 0:
+            create_db_file_name = "createtable_sqlite3.sql"
+        else:
+            create_db_file_name = "createdb_postgresql.sql"
+        with open(create_db_file_name, "r") as f:
             sql = f.read()
         self.conn.execute(sql)
 
     def check_db_exists(self):
         """Проверяет, инициализирована ли БД, если нет — инициализирует"""
-        sql_str = "SELECT * FROM sqlite_master WHERE type='table' AND name='addresses'"
-        sql_str = ('SELECT table_name FROM information_schema.tables WHERE table_schema='
-        'public'
-        ' and table_name=\'addresses\';')
+        if DB_TYPE == 0:
+            sql_str = "SELECT * FROM sqlite_master WHERE type='table' AND name='addresses'"
+        else:
+            sql_str = ('SELECT table_name FROM information_schema.tables WHERE table_schema='
+            'public'
+            ' and table_name=\'addresses\';')
         table_exists = self.conn.execute(sql_str)
         for row in table_exists:
             if row:
