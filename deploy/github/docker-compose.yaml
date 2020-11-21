@@ -1,10 +1,38 @@
 version: "3"
+
+volumes:
+  postgresql_volume:
+
 services:
+
   yandex_tg_bot:
     build: YandexTgBot/
     restart: always
     volumes:
-     - /home/on/remote/db:/db
+     - /home/www/code/tgbots/yandex_tg_bot/db:/home/db
     environment:
-     - YANDEX_API_KEY=...
-     - TELEGRAM_API_TOKEN=...
+     - YANDEX_API_KEY=
+     - TELEGRAM_API_TOKEN=
+     - DB_HOST=
+     - DB_USER=
+     - DB_PASSWORD=
+     - DB_NAME=
+
+  db:
+    image: postgres
+    restart: always
+    ports:
+     - 5432:5432
+    volumes:
+     - postgresql_volume:/var/lib/postgresql/data
+    environment:
+     - POSTGRES_DB=
+     - POSTGRES_USER=
+     - POSTGRES_PASSWORD=
+     - PGDATA=/var/lib/postgresql/data/pgdata
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+     - 8080:8080
