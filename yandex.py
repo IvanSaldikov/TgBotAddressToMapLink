@@ -1,7 +1,6 @@
 # Класс для работы с картами Яндекса
 
 import requests
-import sqlalchemy
 
 
 class YandexMap:
